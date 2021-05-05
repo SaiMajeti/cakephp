@@ -1,0 +1,35 @@
+version: "3.2"
+
+services:
+  # MySQL database container
+  mysql:
+    image: "mysql:5.7.31"
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3308:3306"
+    volumes:
+      - ./mysql:/var/lib/mysql
+    command: [
+      "--general_log=1",
+      "--general_log_file=/var/log/mysql/general.log",
+      "--slow_query_log=1"
+    ]
+  # CakePHP development container
+  cakephp:
+    image: "voquis/cakephp:7.4.13-apache-buster"
+    environment:
+      DEBUG: "true"
+      SECURITY_SALT: ${SECURITY_SALT}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - type: "bind"
+        source: "./app/"
+        target: "/var/www/html"
+    ports:
+      - "8080:80"
